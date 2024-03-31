@@ -1,5 +1,6 @@
 "use client";
 
+import { postBBS } from "@/app/actions/postBBSAction";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,11 +14,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const formSchema = z.object({
+export const formSchema = z.object({
   username: z
     .string()
     .min(2, { message: "ユーザー名は2文字以上で入力してください。" }),
@@ -31,7 +31,6 @@ const formSchema = z.object({
 });
 
 const CreateBBSPage = () => {
-  const router = useRouter();
   //react hook formを作る
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -45,19 +44,7 @@ const CreateBBSPage = () => {
   // z.infer -> 型だけを取り出して後続で定義する
   async function onSubmit(value: z.infer<typeof formSchema>) {
     const { username, title, content } = value;
-    try {
-      await fetch("http://localhost:3000/api/post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, title, content }),
-      });
-      router.push("/");
-      router.refresh();
-    } catch (error) {
-      console.error(error);
-    }
+    postBBS({ username, title, content });
   }
 
   return (
